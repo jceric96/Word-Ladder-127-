@@ -1,11 +1,67 @@
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 import java.util.Set;
 
 public class WordLadder {
+    // BFS
+    // method one: one direction
+    public int ladderLengthI(String beginWord, String endWord, List<String> wordList) {
+        // remove duplicate string
+        Set<String> wordSet = new HashSet<>(wordList);
+        Queue<String> queue = new LinkedList<>();
+        queue.offer(beginWord);
+        Set<String> visited = new HashSet<>();
+        visited.add(beginWord);
+        int distance = 1;
+        while (!queue.isEmpty()) {
+            Queue<String> queue2 = new LinkedList<>();
+            distance++;
+            while (!queue.isEmpty()) {
+                String current = queue.poll();
+                List<String> wordsWithinDistance = getWordsWithinDistance(wordSet, current);
+                for (String word : wordsWithinDistance) {
+                    if (word.equals(endWord)) {
+                        return distance;
+                    }
+                    if (!visited.contains(word)) {
+                        queue2.add(word);
+                        visited.add(word);
+                    }
+                }
+            }
+            queue = queue2;
+        }
+        return 0;
+    }
 
-    public int ladderLength(String beginWord, String endWord, List<String> wordList) {
+    private ArrayList<String> getWordsWithinDistance(Set<String> wordSet, String word) {
+        ArrayList<String> results = new ArrayList<>();
+        char[] wordCharArr = word.toCharArray();
+        for (int i = 0; i < word.length(); i++) {
+            char originChar = wordCharArr[i];
+            for (char c = 'a'; c <= 'z'; c++) {
+                if (c == originChar) {
+                    continue;
+                }
+                wordCharArr[i] = c;
+                String newStr = new String(wordCharArr);
+                if (wordSet.contains(newStr)) {
+                    results.add(newStr);
+                    // remove visited word to reduce time
+                    wordSet.remove(newStr);
+                }
+            }
+            wordCharArr[i] = originChar;
+        }
+        return results;
+    }
+
+    // BFS
+    // method two: two-direction
+    public int ladderLengthII(String beginWord, String endWord, List<String> wordList) {
         // aviod duplicate word
         Set<String> dictionary = new HashSet<String>(wordList);
         if (!dictionary.contains(endWord))
@@ -60,10 +116,10 @@ public class WordLadder {
         String beginWord = "hit";
         String endWord = "cog";
         List<String> wordList = new ArrayList<String>();
-        String[] ss = { "hie", "mie", "mee", "cee", "coe", "cog" };
+        String[] ss = { "hie", "mie", "mee", "mee", "cee", "coe", "cog" };
         for (String s : ss) {
             wordList.add(s);
         }
-        System.out.println(wl.ladderLength(beginWord, endWord, wordList));
+        System.out.println(wl.ladderLengthI(beginWord, endWord, wordList));
     }
 }
